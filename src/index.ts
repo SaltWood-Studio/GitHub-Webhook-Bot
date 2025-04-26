@@ -105,6 +105,8 @@ app.post("/webhook", async (req: Request, res: Response) => {
 
 app.listen(CONFIG.PORT, () => {
     console.log(`🎯 服务已启动 http://localhost:${CONFIG.PORT}`);
+    console.log("当前的环境变量：");
+    Object.entries(CONFIG).forEach(([k, v]) => console.log(`🔒 ${k}=${v}`));
     console.log(`已注册处理器列表：`);
     eventHandlers.forEach(h =>
         console.log(`▸ ${h.eventType}.${h.action || '*'}`)
