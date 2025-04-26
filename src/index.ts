@@ -14,8 +14,8 @@ import { MergedPRHandler, ReopenedPRHandler } from "./handler/pr-handler.js";
 
 // 配置
 export const CONFIG = {
-    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
-    WEBHOOK_SECRET: process.env.WEBHOOK_SECRET,
+    GITHUB_TOKEN: process.env.GITHUB_TOKEN as string,
+    WEBHOOK_SECRET: process.env.WEBHOOK_SECRET as string,
     PORT: 3000
 } as const;
 
