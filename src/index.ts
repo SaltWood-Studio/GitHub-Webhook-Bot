@@ -11,6 +11,7 @@ import { IssueInvalidHandler } from "./handler/issue-closed-not-planned.js";
 import { CompletedLabelHandler, RejectionLabelHandler, UpstreamLabelHandler } from "./handler/issue-labeled.js";
 import { IssueReopenedHandler } from "./handler/issue-reopened.js";
 import { MergedPRHandler, ReopenedPRHandler } from "./handler/pr-handler.js";
+import { Logger } from "./logger.js";
 
 // 配置
 export const CONFIG = {
@@ -53,7 +54,7 @@ const verifySignature = (req: Request, res: Response, next: NextFunction) => {
     const expectedSignature = `sha256=${digest}`;
 
     if (signature !== expectedSignature) {
-        console.warn(`⚠️ 签名验证失败\n预期: ${expectedSignature}\n实际: ${signature}`);
+        Logger.warn(`Signature verification failed.\nExpected ${expectedSignature} but ${signature} found.`, this);
         res.status(401).send("Invalid signature");
         return;
     }
@@ -63,7 +64,7 @@ const verifySignature = (req: Request, res: Response, next: NextFunction) => {
 
 // 事件路由处理
 const handleWebhookEvent = async (event: string, payload: WebhookPayload) => {
-    console.log(`📩 收到事件: ${event} [${payload.action}]`);
+    Logger.info(`Event received: ${event} [${payload.action}]`, this);
 
     const matchedHandlers = eventHandlers.filter(handler =>
         handler.eventType === event &&
@@ -73,18 +74,18 @@ const handleWebhookEvent = async (event: string, payload: WebhookPayload) => {
     );
 
     if (matchedHandlers.length === 0) {
-        console.log(`⏩ 无匹配处理器，跳过处理`);
+        Logger.info(`No matching handler`, this);
         return;
     }
 
-    console.log(`🔧 找到 ${matchedHandlers.length} 个匹配处理器`);
+    Logger.info(`There are ${matchedHandlers.length} handlers found.`, this);
 
     for (const handler of matchedHandlers) {
         try {
             await handler.handle(payload, bot);
-            console.log(`✔️ 处理器 ${handler.eventType}.${handler.action} 执行成功`);
+            Logger.info(`Handler ${handler.eventType}.${handler.action} ended normally.`, this);
         } catch (error) {
-            console.error(`❌ 处理器执行失败: ${error instanceof Error ? error.message : error}`);
+            Logger.error(`Handler exited with an error: ${error instanceof Error ? error.message : error}`, this);
         }
     }
 };
@@ -96,19 +97,25 @@ app.post("/webhook", async (req: Request, res: Response) => {
 
     try {
         await handleWebhookEvent(event, req.body);
-        res.status(200).send("事件处理完成");
+        res.status(200).json({
+            error: null,
+            message: "success"
+        });
     } catch (error) {
-        console.error(`💥 全局错误: ${error}`);
-        res.status(500).send("服务器内部错误");
+        Logger.error(`Error: ${error}`, this);
+        res.status(500).json({
+            error: error,
+            message: "failed"
+        });
     }
 });
 
 app.listen(CONFIG.PORT, () => {
-    console.log(`🎯 服务已启动 http://localhost:${CONFIG.PORT}`);
-    console.log("当前的环境变量：");
-    Object.entries(CONFIG).forEach(([k, v]) => console.log(`🔒 ${k}=${v}`));
-    console.log(`已注册处理器列表：`);
+    Logger.info(`Server started at http://localhost:${CONFIG.PORT}`, this);
+    Logger.info("Current environment variables:", this);
+    Object.entries(CONFIG).forEach(([k, v]) => Logger.info(`🔒 ${k}=${v}`), this);
+    Logger.info(`Registered handlers: `, this);
     eventHandlers.forEach(h =>
-        console.log(`▸ ${h.eventType}.${h.action || '*'}`)
+        Logger.info(`▸ ${h.eventType}.${h.action || '*'}`, this)
     );
 });
