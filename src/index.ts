@@ -17,8 +17,13 @@ import { Logger } from "./logger.js";
 export const CONFIG = {
     GITHUB_TOKEN: process.env.GITHUB_TOKEN as string,
     WEBHOOK_SECRET: process.env.WEBHOOK_SECRET as string,
-    PORT: 3000
+    PORT: 3000,
+    DEBUG: ["true", "1"].some(i => i === process.env.DEBUG?.toLowerCase())
 } as const;
+
+if (CONFIG.DEBUG) {
+    Logger.debugMode = true;
+}
 
 // 注册事件处理器
 const eventHandlers: WebhookEventHandler[] = [

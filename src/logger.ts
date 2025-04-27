@@ -1,12 +1,20 @@
 import { WebhookEventHandler } from "./handler/base.js";
 
 export class Logger {
+    public static debugMode = false;
+
+    public static debug(...args: any[]) {
+        if (this.debugMode) {
+            console.log(Logger.format(...args));
+        }
+    }
+
     public static info(...args: any[]) {
-        console.log(Logger.format(...args), this);
+        console.log(Logger.format(...args));
     }
 
     public static warn(...args: any[]) {
-        console.warn(Logger.format(...args), this);
+        console.warn(Logger.format(...args));
     }
 
     public static error(...args: any[]) {
