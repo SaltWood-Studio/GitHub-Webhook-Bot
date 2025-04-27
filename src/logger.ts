@@ -4,21 +4,19 @@ export class Logger {
     public static debugMode = false;
 
     public static debug(...args: any[]) {
-        if (this.debugMode) {
-            console.log(Logger.format(...args));
-        }
+        if (this.debugMode) console.log(Logger.format("[DEBUG]", ...args));
     }
 
     public static info(...args: any[]) {
-        console.log(Logger.format(...args));
+        console.log(Logger.format("[INFO]", ...args));
     }
 
     public static warn(...args: any[]) {
-        console.warn(Logger.format(...args));
+        console.warn(Logger.format("[WARN]", ...args));
     }
 
     public static error(...args: any[]) {
-        console.error(Logger.format(...args));
+        console.error(Logger.format("[ERROR]", ...args));
     }
 
     private static format(...args: any[]): string {
