@@ -45,7 +45,7 @@ const bot = new Octokit({ auth: CONFIG.GITHUB_TOKEN });
 
 function logAccess(req: Request, res: Response, next: NextFunction) {
     const userAgent = req.headers['user-agent'] ?? '';
-    console.log(`${req.method} ${req.originalUrl} ${req.protocol} <${res.statusCode}> - [${req.ip}] ${userAgent}`);
+    Logger.info(`${req.method} ${req.originalUrl} ${req.protocol} <${res.statusCode}> - [${req.ip}] ${userAgent}`);
 }
 
 // 签名验证中间件
