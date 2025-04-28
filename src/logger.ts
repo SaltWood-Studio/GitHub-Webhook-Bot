@@ -4,19 +4,19 @@ export class Logger {
     public static debugMode = false;
 
     public static debug(...args: any[]) {
-        if (this.debugMode) console.log(Logger.format("[DEBUG]", ...args));
+        if (this.debugMode) console.log(...Logger.format("[DEBUG]", ...args));
     }
 
     public static info(...args: any[]) {
-        console.log(Logger.format("[INFO]", ...args));
+        console.log(...Logger.format("[INFO]", ...args));
     }
 
     public static warn(...args: any[]) {
-        console.warn(Logger.format("[WARN]", ...args));
+        console.warn(...Logger.format("[WARN]", ...args));
     }
 
     public static error(...args: any[]) {
-        console.error(Logger.format("[ERROR]", ...args));
+        console.error(...Logger.format("[ERROR]", ...args));
     }
 
     private static format(...args: any[]): any[] {
@@ -26,6 +26,6 @@ export class Logger {
             args = args.slice(0, args.length - 1);
         }
         const header = instance ? `${instance?.action ?? '-'} [${instance?.eventType ?? '-'}]` : 'Main';
-        return [`[${new Date().toISOString()}] <${header}>`, args];
+        return [`[${new Date().toISOString()}] <${header}>`, ...args];
     }
 }
