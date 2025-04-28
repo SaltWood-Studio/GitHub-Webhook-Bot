@@ -19,13 +19,13 @@ export class Logger {
         console.error(Logger.format("[ERROR]", ...args));
     }
 
-    private static format(...args: any[]): string {
+    private static format(...args: any[]): any[] {
         let instance: WebhookEventHandler | null = null;
         if (args.at(-1) instanceof WebhookEventHandler) {
             instance = args.at(-1);
             args = args.slice(0, args.length - 1);
         }
         const header = instance ? `${instance?.action ?? '-'} [${instance?.eventType ?? '-'}]` : 'Main';
-        return `[${new Date().toISOString()}] <${header}> ${args.join(" ")}`;
+        return [`[${new Date().toISOString()}] <${header}>`, args];
     }
 }

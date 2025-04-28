@@ -1,7 +1,6 @@
 // src/server.ts
 import { Octokit } from "@octokit/rest";
 import express, { Request, Response, NextFunction } from "express";
-import bodyParser from "body-parser";
 import crypto from "crypto";
 import { IssueCompletedHandler } from "./handler/issue-closed-completed.js";
 import { WebhookEventHandler } from "./handler/base.js";
@@ -39,12 +38,18 @@ const eventHandlers: WebhookEventHandler[] = [
 ];
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }))
 
 const bot = new Octokit({ auth: CONFIG.GITHUB_TOKEN });
 
+function logAccess(req: Request, res: Response, next: NextFunction) {
+    const userAgent = req.headers['user-agent'] ?? '';
+    console.log(`${req.method} ${req.originalUrl} ${req.protocol} <${res.statusCode}> - [${req.ip}] ${userAgent}`);
+}
+
 // 签名验证中间件
-const verifySignature = (req: Request, res: Response, next: NextFunction) => {
+function verifySignature(req: Request, res: Response, next: NextFunction): void {
     if (!req.headers["x-hub-signature-256"]) {
         res.status(401).json({
             error: "This API can only be used by GitHub.",
@@ -59,7 +64,7 @@ const verifySignature = (req: Request, res: Response, next: NextFunction) => {
     const expectedSignature = `sha256=${digest}`;
 
     if (signature !== expectedSignature) {
-        Logger.warn(`Signature verification failed.\nExpected ${expectedSignature} but ${signature} found.`, this);
+        Logger.warn(`Signature verification failed.\nExpected ${expectedSignature} but ${signature} found.`);
         res.status(401).send("Invalid signature");
         return;
     }
@@ -67,9 +72,13 @@ const verifySignature = (req: Request, res: Response, next: NextFunction) => {
     next();
 };
 
+app.use(logAccess);
+app.use(verifySignature);
+
 // 事件路由处理
-const handleWebhookEvent = async (event: string, payload: WebhookPayload) => {
-    Logger.info(`Event received: ${event} [${payload.action}]`, this);
+function handleWebhookEvent(event: string, payload: WebhookPayload): void {
+    const id = payload.pull_request?.number || payload.issue?.number || null;
+    Logger.info(`${id !== null ? `#${id} ` : ""}${event}.${payload.action} triggered by ${payload.sender.login ?? '<SYSTEM>'} in ${payload.repository.full_name}`);
 
     const matchedHandlers = eventHandlers.filter(handler =>
         handler.eventType === event &&
@@ -79,35 +88,32 @@ const handleWebhookEvent = async (event: string, payload: WebhookPayload) => {
     );
 
     if (matchedHandlers.length === 0) {
-        Logger.info(`No matching handler`, this);
+        Logger.info(`No matching handler`);
         return;
     }
 
-    Logger.info(`There are ${matchedHandlers.length} handlers found.`, this);
+    Logger.info(`There are ${matchedHandlers.length} handlers found.`);
 
     for (const handler of matchedHandlers) {
-        try {
-            await handler.handle(payload, bot);
-            Logger.info(`Handler ${handler.eventType}.${handler.action} ended normally.`, this);
-        } catch (error) {
-            Logger.error(`Handler exited with an error: ${error instanceof Error ? error.message : error}`, this);
-        }
+        handler.handle(payload, bot)
+            .then(() => Logger.info(`Handler ${handler.eventType}.${handler.action} ended normally.`))
+            .catch((error) => {
+                Logger.error(`Handler exited with an error: ${error instanceof Error ? error.message : error}`);
+            });
     }
 };
-
-app.use(verifySignature);
 
 app.post("/webhook", async (req: Request, res: Response) => {
     const event = req.headers["x-github-event"] as string;
 
     try {
-        await handleWebhookEvent(event, req.body);
+        handleWebhookEvent(event, req.body);
         res.status(200).json({
             error: null,
             message: "success"
         });
     } catch (error) {
-        Logger.error(`Error: ${error}`, this);
+        Logger.error(`Error: ${error}`);
         res.status(500).json({
             error: error,
             message: "failed"
@@ -116,11 +122,11 @@ app.post("/webhook", async (req: Request, res: Response) => {
 });
 
 app.listen(CONFIG.PORT, () => {
-    Logger.info(`Server started at http://localhost:${CONFIG.PORT}`, this);
-    Logger.info("Current environment variables:", this);
-    Object.entries(CONFIG).forEach(([k, v]) => Logger.info(`🔒 ${k}=${v}`), this);
-    Logger.info(`Registered handlers: `, this);
+    Logger.info(`Server started at http://localhost:${CONFIG.PORT}`);
+    Logger.debug("Current environment variables:");
+    Object.entries(CONFIG).forEach(([k, v]) => Logger.debug(`-> ${k}=${v}`));
+    Logger.info(`Registered handlers: `);
     eventHandlers.forEach(h =>
-        Logger.info(`▸ ${h.eventType}.${h.action || '*'}`, this)
+        Logger.info(`- ${h.eventType}.${h.action || '*'}`)
     );
 });
