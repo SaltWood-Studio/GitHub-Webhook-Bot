@@ -44,9 +44,13 @@ app.use(express.urlencoded({ extended: true }))
 const bot = new Octokit({ auth: CONFIG.GITHUB_TOKEN });
 
 function logAccess(req: Request, res: Response, next: NextFunction) {
-    const userAgent = req.headers['user-agent'] ?? '';
-    Logger.info(`${req.method} ${req.originalUrl} ${req.protocol} <${res.statusCode}> - [${req.ip}] ${userAgent}`);
-}
+    next();
+
+    res.on('finish', () => {
+        const userAgent = req.headers['user-agent'] ?? '';
+        Logger.info(`${req.method} ${req.originalUrl} ${req.protocol} <${res.statusCode}> - [${req.ip}] ${userAgent}`);
+    });
+};
 
 // 签名验证中间件
 function verifySignature(req: Request, res: Response, next: NextFunction): void {
