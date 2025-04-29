@@ -120,14 +120,9 @@ let server: ReturnType<typeof app.listen>;
 function handleExit(signal: string) {
     Logger.info(`Received ${signal}, shutting down gracefully`);
     server.close(() => {
-        Logger.info("Server closed");
+        Logger.info("Server stopped");
         process.exit(0);
     });
-
-    setTimeout(() => {
-        Logger.error("Forcing shutdown after timeout");
-        process.exit(1);
-    }, 5000);
 }
 
 process.on('SIGTERM', () => handleExit('SIGTERM'));
