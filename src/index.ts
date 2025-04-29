@@ -90,7 +90,7 @@ const eventHandlers: WebhookEventHandler[] = [
 // ==================== 路由处理 ====================
 function handleWebhookEvent(event: string, payload: WebhookPayload): void {
     const id = payload.pull_request?.number || payload.issue?.number || null;
-    Logger.info(`${id !== null ? `#${id} ` : ""}${event}.${payload.action} triggered by ${payload.sender.login ?? '<SYSTEM>'} in ${payload.repository.full_name}`);
+    Logger.info(`${id !== null ? `#${id} ` : ""}${event}${payload.action ? `.${payload.action}` : ''} event triggered by ${payload.sender.login ?? '<SYSTEM>'} in ${payload.repository.full_name}`);
 
     const matchedHandlers = eventHandlers.filter(handler =>
         handler.eventType === event &&
