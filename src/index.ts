@@ -17,11 +17,20 @@ export const CONFIG = {
     GITHUB_TOKEN: process.env.GITHUB_TOKEN as string,
     WEBHOOK_SECRET: process.env.WEBHOOK_SECRET as string,
     PORT: 3000,
-    DEBUG: ["true", "1"].some(i => i === process.env.DEBUG?.toLowerCase())
+    DEBUG: ["true", "1"].some(i => i === process.env.DEBUG?.toLowerCase()),
+    TRUST_PROXY: process.env.TRUST_PROXY as string
 } as const;
+
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 if (CONFIG.DEBUG) {
     Logger.debugMode = true;
+}
+
+if (["true", "1"].some(i => i === CONFIG.TRUST_PROXY)) {
+    app.set('trust proxy', true);
 }
 
 // 注册事件处理器
@@ -36,10 +45,6 @@ const eventHandlers: WebhookEventHandler[] = [
     new RejectionLabelHandler(),
     new ReopenedPRHandler()
 ];
-
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
 
 const bot = new Octokit({ auth: CONFIG.GITHUB_TOKEN });
 
