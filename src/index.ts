@@ -18,9 +18,9 @@ import { Logger } from "./logger.js";
 export const CONFIG = {
     GITHUB_TOKEN: process.env.GITHUB_TOKEN as string,
     WEBHOOK_SECRET: process.env.WEBHOOK_SECRET as string,
-    PORT: 3000,
+    PORT: parseInt(process.env.PORT!) || 3000,
     DEBUG: ["true", "1"].some(i => i === process.env.DEBUG?.toLowerCase()),
-    TRUST_PROXY: process.env.TRUST_PROXY as string
+    TRUST_PROXY: ["true", "1"].some(i => i === process.env.TRUST_PROXY?.toLowerCase())
 } as const;
 
 if (!CONFIG.GITHUB_TOKEN || !CONFIG.WEBHOOK_SECRET) {
@@ -38,9 +38,7 @@ if (CONFIG.DEBUG) {
     Logger.debugMode = true;
 }
 
-if (["true", "1"].some(i => i === CONFIG.TRUST_PROXY)) {
-    app.set('trust proxy', true);
-}
+if (CONFIG.TRUST_PROXY) app.set('trust proxy', true);
 
 // ==================== GitHub 客户端 ====================
 const bot = new Octokit({ auth: CONFIG.GITHUB_TOKEN });

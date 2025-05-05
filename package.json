@@ -9,7 +9,7 @@
   "scripts": {
     "test": "node --enable-source-maps dist/test.js",
     "build": "rimraf dist && tsc",
-    "start": "node --enable-source-maps dist/index.js"
+    "start": "node --env-file=.env --enable-source-maps dist/index.js"
   },
   "dependencies": {
     "@octokit/rest": "^21.1.1",
