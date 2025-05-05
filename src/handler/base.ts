@@ -1,5 +1,6 @@
 import { Octokit } from "@octokit/rest";
 import { Permission, permissions } from "../types.js";
+import { Logger } from "../logger.js";
 
 // 定义泛型事件处理器接口
 export abstract class WebhookEventHandler<T = any> {
@@ -20,7 +21,9 @@ export abstract class WebhookEventHandler<T = any> {
      * @param payload - GitHub Webhook 的有效载荷
      * @param octokit - 认证的 Octokit 实例
      */
-    abstract handle(payload: T, octokit: Octokit): Promise<void>;
+    async handle(payload: T, octokit: Octokit): Promise<void> {
+        Logger.warn(`WebhookEventHandler: Default implementation invoked.`);
+    }
 
     /**
      * 自定义条件检查 (可选)
