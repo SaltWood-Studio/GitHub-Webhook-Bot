@@ -23,12 +23,6 @@ export abstract class WebhookEventHandler<T = any> {
     abstract handle: (payload: T, octokit: Octokit) => Promise<void>;
 
     /**
-     * 优先级 (可选，默认 0)
-     * 数值越小优先级越高
-     */
-    abstract priority?: number;
-
-    /**
      * 自定义条件检查 (可选)
      * @returns 是否执行该处理器
      */
