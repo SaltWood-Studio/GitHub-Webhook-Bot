@@ -25,7 +25,7 @@ export class Logger {
             instance = args.at(-1);
             args = args.slice(0, args.length - 1);
         }
-        const header = instance ? `${instance?.action ?? '-'} [${instance?.eventType ?? '-'}]` : 'Main';
+        const header = instance ? `${instance?.eventType || '-'} [${instance?.action || '-'}]` : 'Main';
         return [`[${new Date().toISOString()}] <${header}>`, ...args];
     }
 }
