@@ -42,6 +42,10 @@ if (CONFIG.TRUST_PROXY) app.set('trust proxy', true);
 
 // ==================== GitHub 客户端 ====================
 const bot = new Octokit({ auth: CONFIG.GITHUB_TOKEN });
+bot.log.debug = Logger.debug;
+bot.log.info = Logger.info;
+bot.log.warn = Logger.warn;
+bot.log.error = Logger.error;
 
 // ==================== 中间件 ====================
 function logAccess(req: Request, res: Response, next: NextFunction) {
