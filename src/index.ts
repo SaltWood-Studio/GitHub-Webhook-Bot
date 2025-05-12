@@ -9,7 +9,7 @@ import { IssueDuplicatedHandler } from "./handler/issue-closed-duplicated.js";
 import { IssueInvalidHandler } from "./handler/issue-closed-not-planned.js";
 import { CompletedLabelHandler, RejectionLabelHandler, UpstreamLabelHandler } from "./handler/issue-labeled.js";
 import { IssueReopenedHandler } from "./handler/issue-reopened.js";
-import { MergedPRHandler, ReopenedPRHandler } from "./handler/pr-handler.js";
+import { PullRequestMergedHandler, PullRequestReopenedHandler } from "./handler/pr-handler.js";
 import { Logger } from "./logger.js";
 
 // 麻了 TypeScript 没有 #region，看起来好难受
@@ -84,9 +84,9 @@ const eventHandlers: WebhookEventHandler[] = [
     new UpstreamLabelHandler(),
     new CompletedLabelHandler(),
     new IssueReopenedHandler(),
-    new MergedPRHandler(),
+    new PullRequestMergedHandler(),
     new RejectionLabelHandler(),
-    new ReopenedPRHandler()
+    new PullRequestReopenedHandler()
 ];
 
 // ==================== 路由处理 ====================
