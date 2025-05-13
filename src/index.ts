@@ -2,14 +2,8 @@
 import { Octokit } from "@octokit/rest";
 import express, { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
-import { IssueCompletedHandler } from "./handler/issue-closed-completed.js";
 import { WebhookEventHandler } from "./handler/base.js";
 import { WebhookPayload } from "./types.js";
-import { IssueDuplicatedHandler } from "./handler/issue-closed-duplicated.js";
-import { IssueInvalidHandler } from "./handler/issue-closed-not-planned.js";
-import { CompletedLabelHandler, RejectionLabelHandler, UpstreamLabelHandler } from "./handler/issue-labeled.js";
-import { IssueReopenedHandler } from "./handler/issue-reopened.js";
-import { PullRequestMergedHandler, PullRequestReopenedHandler } from "./handler/pr-handler.js";
 import { Logger } from "./logger.js";
 
 // 麻了 TypeScript 没有 #region，看起来好难受
@@ -78,15 +72,7 @@ function verifySignature(req: Request, res: Response, next: NextFunction): void 
 
 // ==================== 事件处理器 ====================
 const eventHandlers: WebhookEventHandler[] = [
-    new IssueCompletedHandler(),
-    new IssueDuplicatedHandler(),
-    new IssueInvalidHandler(),
-    new UpstreamLabelHandler(),
-    new CompletedLabelHandler(),
-    new IssueReopenedHandler(),
-    new PullRequestMergedHandler(),
-    new RejectionLabelHandler(),
-    new PullRequestReopenedHandler()
+    // Here's your handlers
 ];
 
 // ==================== 路由处理 ====================

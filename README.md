@@ -1,11 +1,11 @@
 <div align="center">
 
-# PCL-Community-Bot
-✨🎉 **基于 Octokit 的 Issue 处理自动化机器人** 🎉✨
+# GitHub-Webhook-Bot
+✨🎉 **基于 Octokit 和 Webhook 的 GitHub 事件自动化处理机器人** 🎉✨
 </div>
 
 # 简介
-使用 [OctoKit](https://github.com/octokit) 实现的 Issue 处理自动化机器人
+使用 [OctoKit](https://github.com/octokit) 和 Webhook 实现的 GitHub 事件自动化处理机器人
 
 # 使用
 ## 1. 使用 Docker Compose
