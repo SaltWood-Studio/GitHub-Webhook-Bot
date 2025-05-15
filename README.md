@@ -7,6 +7,13 @@
 # 简介
 使用 [OctoKit](https://github.com/octokit) 和 Webhook 实现的 GitHub 事件自动化处理机器人
 
+# 自定义
+1. 点击右上角 Use this template
+2. 点击 Create a new repository
+3. 创建仓库
+4. 在 `src/handler` 下创建你的 Handler（继承自 `WebhookEventHandler<WebhookPayload>`）
+5. 在 `index.ts` 下添加 `new YourCustomHandler()`
+
 # 使用
 ## 1. 使用 Docker Compose
 1. 克隆项目
