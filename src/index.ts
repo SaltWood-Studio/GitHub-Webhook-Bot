@@ -84,7 +84,7 @@ function handleWebhookEvent(event: string, payload: WebhookPayload): void {
         handler.eventType === event &&
         (handler.action ? handler.action === payload.action : true) &&
         (!handler.condition || handler.condition(payload)) &&
-        payload.sender.login !== 'PCL-Community-Bot'
+        payload.sender.login !== '<YOUR_BOT_NAME_FILL_HERE_TO AVOID_UNEXPECTED_ACTIONS>'
     );
 
     if (matchedHandlers.length === 0) {
